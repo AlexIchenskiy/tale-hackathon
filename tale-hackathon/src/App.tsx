@@ -8,16 +8,17 @@ function App() {
 
   return (
     <>
-      {!pressed && 
-        <div className='start-container'>
-          <div className='start' onClick={() => setPressed(true)}>Start reading</div>
-        </div>}
-      {pressed && <PageContainer />}
+      <div className='start-container' style={{ height: '100vh', top: pressed ? '-100%' : 0, position: 'absolute', transition: 'top 0.3s ease-in-out' }}>
+        <div className='start' onClick={() => setPressed(true)}>Start reading</div>
+      </div>
+      <div style={{ height: '100vh', top: pressed ? 0 : '100%', position: 'absolute', transition: 'top 0.3s ease-in-out' }}>
+        <PageContainer prevCallback={() => setPressed(false)} />
+      </div>
     </>
   );
 }
 
-function PageContainer() {
+function PageContainer({ prevCallback }: { prevCallback?: () => void }) {
   const recapRef = useRef<HTMLDivElement>(null);
 
   const [currentPage, setCurrentPage] = useState(0);
@@ -59,7 +60,14 @@ function PageContainer() {
   }
 
   const handlePrevPage = () => {
-    setCurrentPage((prev) => Math.max(0, prev - 1));
+    const newPage = Math.max(0, currentPage - 1)
+    setCurrentPage((prev) => newPage);
+    if (newPage === 0) {
+      setRecapShown(false);
+    }
+    if (prevCallback && currentPage - 1 < 0) {
+      prevCallback();
+    }
   }
 
   const openRecapHandler = useSwipeable({
@@ -77,7 +85,8 @@ function PageContainer() {
     }
   });
 
-  return <>
+
+  return <div style={{ height: '100vh', overflow: 'hidden' }}>
     <div className="App" style={{ width: width, backgroundColor: bgColor }} onClick={(e) => {
       const x = e.clientX;
       if (x < width / 2) {
@@ -89,14 +98,21 @@ function PageContainer() {
     }}
       {...pageSwitchHandler}
     >
-      {pages.map((page, index) => {
-        return (
-          <div className='page' key={index} style={{ width: width, left: width * (index - currentPage), color: textColor }}>{page}</div>
-        );
+      <div>
+        {pages.map((page, index) => {
+          return (
+            <>
+              { <div className='page' key={index} style={{ width: width, left: width * (index - currentPage), color: textColor, whiteSpace:
+                "pre-line"
+              }}>{page}</div> }
+                {/* { {currentPage !== index && <div style={{width: width, left: width * (index - currentPage), height: '100%', position: 'absolute', backdropFilter: 'blur(15px)'}}></div>} */}
+            </>
+          );
 
-      })}
+        })}
+      </div>
+      <div className='swipe' {...openRecapHandler}></div>
     </div>
-    <div className='swipe' {...openRecapHandler}></div>
     <div className='recap' style={{ backgroundColor: textColor, color: bgColor, bottom: recapShown ? 0 : (recapRef?.current?.clientHeight ? -2 * recapRef?.current?.clientHeight : '-100%') }} {...closeRecapHandler} ref={recapRef}>
       <div className="modal-close-button" onClick={() => setRecapShown(false)}>
         <span style={{ backgroundColor: bgColor }}></span>
@@ -105,7 +121,7 @@ function PageContainer() {
 
       <div style={{ color: bgColor }}>{recap}</div>
     </div>
-  </>
+  </div>
 }
 
 const recaps = [
@@ -128,19 +144,7 @@ const recaps = [
 ]
 
 
-const pages = [
-  "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus sed ullamcorper velit, vitae mattis magna. Aliquam et finibus tortor. Nulla facilisi. Cras ac cursus elit. Nam auctor felis ut dui porttitor ultricies. Vestibulum nunc nisi, tincidunt sodales aliquet nec, euismod at lorem. Cras dignissim ornare laoreet.",
-  "Suspendisse vel sapien posuere, sagittis justo sit amet, pulvinar orci. Mauris accumsan vitae ipsum eget tincidunt. Pellentesque ut sollicitudin libero, ut sodales quam. Nunc non condimentum nisi, fringilla sodales tellus. Nulla diam lacus, tempor non pharetra efficitur, facilisis eget enim. Mauris justo tortor, facilisis in luctus eget, ullamcorper vitae felis. Ut diam lorem, sagittis nec nibh nec, vulputate ornare nibh.",
-  "Maecenas et mattis sapien. Aliquam erat volutpat. Nullam aliquet nunc id eros scelerisque scelerisque. Aliquam sed ipsum ante. Cras sed lacus dui. Mauris varius, arcu eu mattis egestas, tortor risus pellentesque dui, ac elementum magna augue in ligula. Etiam quis laoreet ipsum. Cras a ante id urna commodo porta ornare vel neque. Mauris id risus semper nulla gravida faucibus. Donec eget facilisis dolor.",
-  "Nullam commodo ex et accumsan finibus. Maecenas a maximus dolor. Nam sed maximus quam. In quis ligula vel ex iaculis ornare at id massa. Sed aliquet eros ex, id consequat est aliquam non. Donec lobortis augue eu ligula tristique, a maximus mi convallis. Vivamus eu neque eleifend, finibus libero ac, pellentesque mauris. Nullam fermentum ante congue mi consequat interdum. Interdum et malesuada fames ac ante ipsum primis in faucibus. Morbi scelerisque rutrum lacus id bibendum. Proin nec est eget tellus viverra facilisis a in neque. Vestibulum eleifend iaculis congue. Nunc aliquam id ipsum condimentum finibus. Donec eu auctor ex.",
-  "Vestibulum metus ipsum, malesuada vitae dictum a, rhoncus vitae orci. Vivamus nisi neque, rutrum ut mollis sed, fringilla vel lorem. Vestibulum sapien dolor, laoreet in dapibus euismod, pellentesque a tellus. Ut pharetra odio ac dui iaculis bibendum. In facilisis fermentum nunc sit amet tincidunt. Integer ultricies ligula turpis, ut sollicitudin elit molestie nec. Aliquam odio urna, bibendum facilisis nunc et, ullamcorper pretium tortor. Nunc eget turpis ullamcorper, faucibus ante at, egestas ante. In placerat vel est sit amet hendrerit. Vestibulum eget purus leo. Praesent bibendum nulla tempus tincidunt mollis. Proin dictum leo mi, quis pretium enim interdum vel. Fusce sit amet nunc vitae augue fermentum tincidunt vitae viverra sem.",
-  "Sed consequat ut nisl at egestas. Duis ullamcorper ornare tortor, non mollis mi tincidunt vitae. In mattis erat in lectus varius interdum. Pellentesque quam nisl, feugiat sed ligula ac, porttitor accumsan justo. Nunc rutrum convallis urna sit amet volutpat. Vivamus rhoncus neque quis urna auctor elementum. Nunc ultricies, risus eget consectetur pulvinar, metus nulla ultrices odio, at volutpat leo tortor eget erat. Cras lectus dui, eleifend ut laoreet vitae, suscipit in neque. Mauris aliquam lorem a blandit sollicitudin.",
-  "Phasellus sagittis, turpis ut laoreet laoreet, velit augue laoreet urna, vitae sagittis nulla augue ac lorem. Donec in nunc nec arcu auctor cursus. Nullam sed quam at enim tristique aliquet. Cras efficitur elit et finibus tincidunt. Fusce non elit vehicula, gravida nulla vitae, varius mauris. Mauris fringilla arcu vel urna facilisis, ut auctor sapien semper. Phasellus at libero nec ligula elementum blandit eu non enim. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Morbi luctus imperdiet nunc, vitae scelerisque ante mattis eget. Aenean mollis enim ac justo luctus, eu suscipit lacus laoreet.",
-  "Aenean aliquet interdum consequat. In hac habitasse platea dictumst. Quisque tristique consequat sem, eget lacinia felis tincidunt in. Nulla ac pellentesque massa. Suspendisse tincidunt condimentum orci non posuere. Vivamus consequat tempus sapien, et faucibus libero porta vehicula. Sed iaculis nisi dolor, eu hendrerit lacus volutpat ut. Donec in mollis nulla, in scelerisque lorem. Etiam et nunc eu lacus porta lobortis eget in tortor. Morbi quis tincidunt eros.",
-  "Duis nulla ex, pulvinar vitae elementum non, laoreet sed ligula. Duis dignissim id tortor ac imperdiet. Nulla et metus est. Aliquam feugiat sagittis mi, id eleifend ante. Aliquam tempor nec augue vitae vehicula. Suspendisse et ullamcorper nisi. Fusce cursus eu justo at iaculis. Nullam in congue ante. Proin dapibus risus volutpat arcu mollis, eget accumsan lacus tristique. Curabitur ullamcorper odio ut bibendum vestibulum. Aenean eget erat ullamcorper, vehicula urna quis, tincidunt turpis. Nulla scelerisque fringilla porta. Nam sit amet lacus quis neque lacinia volutpat nec at sapien.",
-  "Duis porta vitae dolor vitae viverra. Vivamus rhoncus dolor ut mi aliquam, non sollicitudin libero suscipit. Maecenas vestibulum nunc tincidunt, condimentum purus in, fringilla dolor. Mauris imperdiet pretium sem, hendrerit dapibus nunc bibendum eu. Cras mattis euismod mi, eget congue urna volutpat eu. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean congue sagittis lacus, non tristique sem sodales quis. Etiam quis ullamcorper felis. Quisque et nulla risus. Mauris porttitor elit finibus ipsum malesuada, eget viverra nibh fringilla.",
-  "Sed elementum felis eu vestibulum commodo. Nullam ultrices molestie quam, ut tincidunt lacus rhoncus nec. Nullam id lacinia eros. Fusce feugiat pharetra odio eget condimentum. Quisque nec justo odio. Etiam auctor sem id eros mollis, vitae interdum elit scelerisque. Sed laoreet fermentum enim, et cursus leo faucibus vel. Nunc ut lectus id magna pharetra interdum quis id mauris. Sed id neque molestie, hendrerit nisi quis, varius quam. Nulla egestas nunc id neque bibendum egestas. Fusce laoreet pellentesque massa, in vestibulum massa dignissim sit amet. Nullam pharetra sapien sit amet odio accumsan elementum. Maecenas hendrerit pellentesque lorem ac laoreet.",
-  "Pellentesque vehicula massa condimentum metus dapibus consequat nec a turpis. Mauris ut arcu eget ipsum posuere porta vitae nec nunc. Curabitur ac mi diam. Quisque ornare urna ut arcu venenatis, vel aliquam arcu volutpat. Phasellus ut rutrum diam. In sed nunc finibus, finibus ligula sit amet, vulputate arcu. Nullam ultricies eleifend sapien, nec dictum neque scelerisque vel. Sed quis libero bibendum, finibus ex at, malesuada neque."
-];
+const pages = [`the bed is big enough for two people\nshe and someone else\na table\ntwo books\nshe and someone else`,`i cannot understand anyone\ni brought a dictionary (german croatian)\nand two big milka\nchocolate bars for lunch dinner and over night\nthat is how i was remembering our shared life`,`before this the two of us exchanged 73 messages\neach word a message\nenter like inhale\n73 more than over the last ten years\nmore than ever before`,`a missed call\na german phone number\na whatsapp message\ni am calling you for support and cheer i am in the hospital\nshe quipped about the dinamo soccer team and cheering fans\nso far only medical tests\nenter like exhale\ni did not call\nbecause i am selfish\nbecause i wanted us to be writing \nto have the messages to remember\nto mull over later\ni brought a dictionary (german croatian)\nto read the test results\nthere is room in the bed for two`,`i cannot write from her perspective\ni cannot know how she feels\ni cannot write the character of the woman who is speaking to me\ni cannot create her motivation\ncomplexity\nto build a character for this text\ni cannot write her\nwithout knowing her\nbut i can write about her\nabout what she told me\nabout us\nhow i got to know her again now that i am a man\nand squeezed my eyes tight shut\ni try to remember when we last\nslept together when i was a girl\nthere is room in the bed for two `,`let them chop off whatever they like\nshe said\nbut i thought of all the texts i have been reading about the\nrepresentation of women\ni disgust myself\nmy own mother is writing me about her disease\nbut my thoughts are on literature\nwho are you to write about that\non the promenade in split\ncrammed into a cafe where they pile\nbooks by each table\nbooks that have assumed the color of coffee`,`because nobody has ever opened them\ni imagined taking a glass and throwing it at\nthe wall of the hipster cafe\nthe whatsapp message\nmagnetic procedure infusion up down ct then\nmagnetic on a full stomach then antibiotic\na big wound`,`i wanted to throw a glass at the wall\nbut all i did was respond to my cell phone\ncalmest in the world\nand asked have you eaten so what is the food like\nthat seemed logical\nbecause concern for another is manifested through\nfeeding\nas if i have any idea what she likes\nbesides chocolate\ntwo big milkas\nfor lunch dinner and over night`,`i eat pudding\nshe listed the flavors for me\nstrawberry\nchocolate\nvanilla\nbanana\nshe described the way the food is served in the most minute \ndetail\neverything that a person who cannot eat\nobserves\nbecause she knows that silence over the phone has\nspecial weight`,`let them chop off whatever they like\nshe said\nshe laughed\ni said\ngerman hospitals are better than ours\ni do not know why\ni have never been to germany\ni know nothing about their hospitals \nbut i wanted her to feel safe`,`i said that and what i wanted to say was\neverything will be fine\nthey have modern equipment and what matters is\nyou decided to go to the hospital\nthough i know this is not the case\nand my brother made her go\nalthough i know she knew what was happening for months`,`you talk to me about dinamo and cheering you on\nand i stand there with beers and peanuts and tightly \nsqueeze my eyes shut\ni try to remember when we last\nslept together when i was a girl`,`i hate languages\nand german\nand hospitals that are far away\nand i would prefer you being right here at vinogradska hospital\nso we could go out in front of the building \nand talk about the crappy equipment\nabout how somewhere else would be better\nand getting to know each other in the city where we both\nlived when i was a girl\nwhere later i wandered as a man by night through the streets\nand you stood at home by the phone\nin the city where you had a child\nand i had a mother\nthere is room in the bed for two`,`i am not at all sure you are telling the truth\ni know that sounds terrible\nhow dare you talk with her like that\nshe is ill\nshe gave birth to you\nbe by her side\nthese are the toughest moments\nthe struggle is only beginning\nthis is not merely a physical thing\neverything ends\nthis information is difficult to take in\nbe by her side`,`i imagine how it eats away at you\nhow your organs fail\nhow i hugged you as a child\nand how your skin was soft\nthat part i invented\nyou have been a smoker for 40 years\nnever has your skin been soft`,`i cannot remember when i last hugged you\nbut i picture your body falling apart\nand i break out in a sweat\ni am scared\nwait\ndo not rush\ntake it easy`,`i always had a thousand questions\nthis drove you crazy\nwhen you drove 2000 kilometers\nto another country\nto father in jail\ni could never sleep\na thousand questions\nthis drove you crazy`,`the 73 whatsapp messages\nenter inhale\ndo not ask\nwait\neven i do not know everything yet\nwe will see\nit is a tumor\nthey need to consult with a plastic surgeon\nstop patience\nenter exhale\ni always panic about everything\nbut this has already happened to so many people\nthere is nothing so awful about it`,`i spoke with the world's calmest voice\nbut i wanted to throw a glass at the wall\nmama\ndo you have any family history of cancer\ni asked you\nbecause at home there was never mention of it\nyou said they asked you that too but only after everything\nyour grandmother died of colon cancer\nsilence\ncolon cancer?\nyes\nyou said yes`,`but what you meant to say was\nyes grandma had cancer\nand we lied to you children that it was a ruptured\nappendix\nso you two would not worry or think about it\ni did not say anything`,`your grandmother died of cancer\nreverberated in my head\ni remembered every no i circled\nevery consent in the transition process \nevery form\ni have no family history of cancer\nand this is why i shoot up testosterone\nand why i am confident when the lady psychologist \nsays\ncancer it is often a congenital disease\nand if it does not appear in your family history`,`that is good news for a hypochondriac\ni am scared for myself\ni am obsessed with palpating my breasts`,`i asked you\ndo they remove the whole breast\nand i wanted to ask\nmama\nhas it spread\nhow big is it\ni wanted to hear\nthey only remove that part\nbut you said you do not know\nand added\nlet them chop off what they like and laughed\nluckily you have breasts like grandma had\nand besides i only wear a size one`,`i imagined you saying to me\nwhat do you know about that\nand about the flint of a cigarette lighter \non the sixth floor of a hospital in germany\nthe feeling when i go out alone onto the balcony for smokers \nand how i felt while i was carrying you in my\nbelly\nand when we conceived you 2000 kilometers away\nduring an open visit to a prison in the netherlands`,`how could you know anything at all about how i feel\nfrom that armchair of yours\nand empty word processor\nand how you turn our shared grief into\nmaterial for writing\nwhat do you know about that\nwhen we exchanged the 73 messages over\nwhatsapp\n73 more than over the last ten years`,`i imagine you telling me all that\nbut all you do is pretend nothing is happening\nand talk to me about food\nbecause that is what i asked you \nthe other day i was still appalled about the drama of a\nwoman\n(a prominent italian woman writer)\nwho wrote about migrants\nfrom her armchair\nin her sparsely designed home`,`and here am i\nmy very own mother has cancer\nthat is consuming her organs\nand i am drinking beer\nin another country\nin another city\nand writing about imminent death\nor healing\nholy shit`,`once a person told me about their\nexperience\nin the context of me being transgendered\nand having my breasts reduced\nshe told me she is thinking about doing it\nthough she is not trans\nbecause her grandmother and mother died of breast cancer`,`how candid she is\nand brave\ni thought\ni thought long and hard about those lives\nand about her feeling this every day\nfears for her own life`,`i thought long and hard\nabout how she says to herself\nbreathe in\nslowly\ndo not rush\nwait\nand then it happened to you\nand i ask you about the food \nbecause concern for another is manifested through\nfood`,`because i actually wanted you to be in the city where\nwe were together when i was a girl\nwhere i had a mother\nand you had a child\nbreathe out`,`message\npick up\nholy shit\nwhat is happening\nhi bro\nhey\nis everything okay\nhe is crying\nmy brother never cries`,`is everything okay\nno it is not where you are\nin split what happened\nit has spread\nembolism to both lungs\nher liver\npointless to operate\nlisten i think that\nlisten i think that\nlong pause`,`dunno\nthey will prolong her life for as long as they can\ni say nothing\nare you still there he asks\ni am \nsorry\ni tell him sorry\nas if you are not my mother too\ni tell him sorry\nbecause you truly were that for him\nbecause you two are bonded in ways i cannot even imagine`,`i wanted to tell him everything would be fine\ni did not say that to him\nwe do not talk that way\nwe know life is never fine`,`sorry\ni repeat once more\nlove you bro\ncall\ni am here\nright?`,`i go back to the table as if nothing has happened\npay for the coffee\nwalk\ni do not know where i am\npanic attacks\nan everyday thing\nnothing new\ncut the melodrama\ni repeat to myself \nyou have no right to make yourself the victim`,`i told my brother i love him\ni had not said that to him for 10 years\npoor me while i stand in the breeze by the sea and\nwait for the bus\nbecause split is a foreign city\nbecause i am nauseous\nbecause i need my bed\ndiazepams\nand my bathtub\nbecause i need to be a grown up and pack my suitcase`,`on the bus for eight hours i imagined\na place you two have been existing for years\na place i have never been\nin your room i see the blanket you covered yourself with\nthe blanket under which i tucked my hand so often\ntook the remote and switched off the tv when you were already\nfast asleep\nand i came in high from being out`,`the blanket full of burn holes because you fell asleep \na hundred times with a cigarette in your hand\nthe blanket i used to cover my mouth when i\nvomited in the room from drugs\nso i would be quieter\nso you would not hear me`,`i remember we had the blanket when we lived\ntogether back when i was a girl\nwe all had it\nbrother\nyou\nand me\nthat blanket is the only familiar thing i can\nconnect to you`,`i do not know you\ni do not even know your favorite song\never since i heard that you are dying\ni have been calling you mama\nmama\nmama`];
 
 export default App;
+
