@@ -1,18 +1,25 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import './App.css'
+import { bestTextColor, mixColors } from './utils';
+import { useSwipeable } from 'react-swipeable';
 
 function App() {
   const [pressed, setPressed] = useState(false);
 
   return (
     <>
-      {!pressed && <button onClick={() => setPressed(true)}>Start reading</button>}
+      {!pressed && 
+        <div className='start-container'>
+          <div className='start' onClick={() => setPressed(true)}>Start reading</div>
+        </div>}
       {pressed && <PageContainer />}
     </>
   );
 }
 
 function PageContainer() {
+  const recapRef = useRef<HTMLDivElement>(null);
+
   const [currentPage, setCurrentPage] = useState(0);
 
   const width = 430;
@@ -20,31 +27,105 @@ function PageContainer() {
   const bgColors = ['#000', '#fff', '#000'];
 
   const [bgColor, setBgColor] = useState(bgColors[0]);
+  const [textColor, setTextColor] = useState(bgColors[1]);
+  const [recapShown, setRecapShown] = useState(false);
+
+  const recap = recaps.slice(0, currentPage).reverse().find((recap) => recap !== undefined);
 
   useEffect(() => {
+    let bg = bgColors[0];
+    let text = bgColors[1];
+
     if (currentPage === 0) {
-      setBgColor(bgColors[0]);
+      bg = bgColors[0];
+      text = bgColors[1];
+    } else if (currentPage === 1) {
+      bg = bgColors[1];
+      text = bgColors[0];
     } else if (currentPage === pages.length - 1) {
-      setBgColor(bgColors[2]);
+      bg = bgColors[2];
+      text = bgColors[1];
     } else {
-      setBgColor((currentPage === 0) ? (bgColors[0]) : (`color-mix(in srgb, ${bgColors[1] + ' ' + ((pages.length-1) / currentPage * 100 / 12) + '%'}, ${bgColors[2] + ' ' + (100 - ((pages.length-1) / currentPage * 100 / 12)) + '%'})`));
+      const w1 = (pages.length) / currentPage / 12;
+      bg = mixColors(bgColors[1], bgColors[2], w1);
+      text = bestTextColor(bg);
     }
+    setBgColor(bg);
+    setTextColor(text);
   }, [currentPage]);
 
-  return <div className="App" style={{ width: width, backgroundColor: bgColor }} onClick={(e) => {
-    const x = e.clientX;
-    if (x < width / 2) {
-      setCurrentPage((prev) => Math.max(0, prev - 1));
+  const handleNextPage = () => {
+    setCurrentPage((prev) => Math.min(pages.length - 1, prev + 1));
+  }
+
+  const handlePrevPage = () => {
+    setCurrentPage((prev) => Math.max(0, prev - 1));
+  }
+
+  const openRecapHandler = useSwipeable({
+    onSwiped: (eventData) => eventData.dir === 'Up' && currentPage > 0 && setRecapShown(true),
+  });
+
+  const closeRecapHandler = useSwipeable({
+    onSwiped: (eventData) => eventData.dir === 'Down' && setRecapShown(false),
+  });
+
+  const pageSwitchHandler = useSwipeable({
+    onSwiped: (eventData) => {
+      eventData.dir === 'Right' && handlePrevPage();
+      eventData.dir === 'Left' && handleNextPage()
     }
-    else {
-      setCurrentPage((prev) => Math.min(pages.length - 1, prev + 1));
-    }
-  }}>{pages.map((page, index) => {
-    return (
-      <div className='page' key={index} style={{ width: width, left: width * (index - currentPage) }}>{page}</div>
-    );
-  })}</div>
+  });
+
+  return <>
+    <div className="App" style={{ width: width, backgroundColor: bgColor }} onClick={(e) => {
+      const x = e.clientX;
+      if (x < width / 2) {
+        handlePrevPage();
+      }
+      else {
+        handleNextPage();
+      }
+    }}
+      {...pageSwitchHandler}
+    >
+      {pages.map((page, index) => {
+        return (
+          <div className='page' key={index} style={{ width: width, left: width * (index - currentPage), color: textColor }}>{page}</div>
+        );
+
+      })}
+    </div>
+    <div className='swipe' {...openRecapHandler}></div>
+    <div className='recap' style={{ backgroundColor: textColor, color: bgColor, bottom: recapShown ? 0 : (recapRef?.current?.clientHeight ? -2 * recapRef?.current?.clientHeight : '-100%') }} {...closeRecapHandler} ref={recapRef}>
+      <div className="modal-close-button" onClick={() => setRecapShown(false)}>
+        <span style={{ backgroundColor: bgColor }}></span>
+        <span style={{ backgroundColor: bgColor }}></span>
+      </div>
+
+      <div style={{ color: bgColor }}>{recap}</div>
+    </div>
+  </>
 }
+
+const recaps = [
+  "recap 1",
+  undefined,
+  undefined,
+  "recap 2",
+  undefined,
+  undefined,
+  "recap 3",
+  "recap 4",
+  undefined,
+  undefined,
+  "recap 5",
+  "recap 6",
+  undefined,
+  undefined,
+  "recap 7",
+  "recap 8",
+]
 
 
 const pages = [
