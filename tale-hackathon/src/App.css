@@ -3,8 +3,8 @@
   height: 100%;
   display: flex;
   flex-direction: column-reverse;
+  align-items: center;
   padding-bottom: 30%;
-  padding-left: 15%;
   position: relative;
 }
 
@@ -26,7 +26,7 @@
 }
 
 .page {
-  padding: 6rem 3rem;
+  padding: 12rem 3rem;
   position: absolute;
   transition: color 0.6s ease-in-out, left 0.3s ease-in-out, backdrop-filter 0.2s ease-in-out;
   overflow: hidden;
@@ -50,12 +50,18 @@
   transition: all 0.6s ease-in-out;
 }
 
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
 .modal-close-button {
   width: 25px;
   height: 25px;
   position: relative;
   transition: 0.2s transform;
-  margin-bottom: 1.5rem;
 
   span {
     width: 25px;
@@ -73,4 +79,35 @@
     margin-bottom: 1px;
     transform: rotate(-45deg);
   }
+}
+
+.modal-dropdown {
+  border: 2px solid;
+  position: relative;
+}
+
+/* .modal-dropdown-button {
+  width: 12px;
+  height: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-left: 1px solid;
+  border-bottom: 1px solid;
+} */
+
+.modal-dropdown-current {
+  padding: 0.25rem;
+  z-index: 10;
+  position: relative;
+}
+
+.modal-dropdown-other {
+  width: 29.52px;
+  text-align: center;
+  border: 2px solid;
+  border-top: none;
+  left: -2px;
+  z-index: 5;
+  transition: all 0.3s ease-in-out;
 }
