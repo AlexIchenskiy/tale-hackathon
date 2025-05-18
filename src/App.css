@@ -96,6 +96,10 @@
   border-bottom: 1px solid;
 } */
 
+.modal-dropdown {
+  width: 29.52px
+}
+
 .modal-dropdown-current {
   padding: 0.25rem;
   z-index: 10;

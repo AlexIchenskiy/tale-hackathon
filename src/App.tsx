@@ -17,15 +17,17 @@ function App() {
       </div>
       <div style={{ height: '100vh', top: pressed ? 0 : '100%', position: 'absolute', transition: 'top 0.3s ease-in-out' }}>
         <PageContainer prevCallback={() => setPressed(false)} currentPage={currentPage} setCurrentPage={setCurrentPage} 
-        goToSplashScreen={() => setPressed(false)}/>
+        goToSplashScreen={() => setPressed(false)} previousSessionRecap={previousSessionRecap}/>
       </div>
     </>
   );
 }
 
-function PageContainer({ prevCallback, currentPage, setCurrentPage, goToSplashScreen }: { 
+function PageContainer({ prevCallback, currentPage, setCurrentPage, goToSplashScreen, previousSessionRecap }: { 
   goToSplashScreen: () => void,
-  prevCallback?: () => void, currentPage: number, setCurrentPage:  React.Dispatch<React.SetStateAction<number>>}) {
+  prevCallback?: () => void, currentPage: number, setCurrentPage:  React.Dispatch<React.SetStateAction<number>>,
+  previousSessionRecap?: string[]
+}) {
   const recapRef = useRef<HTMLDivElement>(null);
 
 
@@ -42,8 +44,9 @@ function PageContainer({ prevCallback, currentPage, setCurrentPage, goToSplashSc
   const [dropdownCurrent, setDropdownCurrent] = useState(0);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const recap = recapByLanguage[dropdownData[dropdownCurrent]][currentPage]
+  const recap = recapByLanguage[dropdownData[dropdownCurrent] as 'EN' | 'HR'][currentPage]
   useEffect(() => {
+    // Dynamic coloring (to be refined)
     // let bg = bgColors[0];
     // let text = bgColors[1];
 
@@ -113,7 +116,7 @@ function PageContainer({ prevCallback, currentPage, setCurrentPage, goToSplashSc
     },
     onTap: (e) => {
       
-      const x = e.clientX;
+      const x = e.event.clientX || e.event.touches[0].clientX;
       
       if (x < width / 2) {
         handlePrevPage();
