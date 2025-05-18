@@ -11,7 +11,7 @@ function App() {
   const [lastPage, setLastPage] = useState(-1);
   const [dropdownCurrent, setDropdownCurrent] = useState(0);
 
-  const previousSessionRecap = recapByLanguage[dropdownData[dropdownCurrent] as 'EN' | 'HR'].slice(Math.max(0, currentPage - 5), currentPage);
+  const previousSessionRecap = recapByLanguage[dropdownData[dropdownCurrent] as 'EN' | 'HR'].slice(Math.max(0, currentPage - 3), currentPage);
 
   useEffect(() => {
     pressed === false && setLastPage(currentPage);
@@ -188,7 +188,7 @@ function PageContainer({ prevCallback, currentPage, setCurrentPage, goToSplashSc
             ))}
           </div>
         </>
-      )}
+      ) || null}
     </div>
   </div>
 }
