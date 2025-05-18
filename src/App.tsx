@@ -7,6 +7,8 @@ function App() {
   const [pressed, setPressed] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
 
+  const previousSessionRecap = recaps.slice(Math.max(0, currentPage - 5), currentPage)
+
 
   return (
     <>
