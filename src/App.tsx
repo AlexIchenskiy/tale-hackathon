@@ -21,7 +21,7 @@ function App() {
   return (
     <>
       <div className='start-container' style={{ height: '100lvh', top: pressed ? '-100lvh' : 0, position: 'absolute', transition: 'top 0.3s ease-in-out', overflow: 'hidden' }} onClick={() => setPressed(true)}>
-        <div className='start'>{currentPage === 0 ? `Start reading` : `Continue Reading`}</div>
+        <div className='start'>{currentPage === 0 ? `Tap to start reading` : `Tap to continue Reading`}</div>
       </div>
       <div style={{ height: '100lvh', top: pressed ? 0 : '100lvh', position: 'absolute', transition: 'top 0.3s ease-in-out', overflow: 'hidden' }}>
         <PageContainer prevCallback={() => setPressed(false)} currentPage={currentPage} setCurrentPage={setCurrentPage}
