@@ -50,6 +50,7 @@
   bottom: -100%;
   height: fit-content;
   padding: 3rem;
+  padding-bottom: 4.5rem;
   transition: all 0.6s ease-in-out;
 }
 
