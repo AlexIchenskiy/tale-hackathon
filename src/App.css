@@ -44,10 +44,19 @@
   position: absolute;
   left: 0;
   width: 100%;
+  max-height: 100%;
+  overflow: scroll;
   bottom: -100%;
   height: fit-content;
   padding: 3rem;
   transition: all 0.6s ease-in-out;
+}
+
+.recap-title {
+  font-size: 28px;
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
 }
 
 .modal-actions {
@@ -95,6 +104,10 @@
   border-left: 1px solid;
   border-bottom: 1px solid;
 } */
+
+.modal-dropdown {
+  width: 29.52px
+}
 
 .modal-dropdown-current {
   padding: 0.25rem;
