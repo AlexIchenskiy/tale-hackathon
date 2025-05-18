@@ -11,7 +11,7 @@ function App() {
   const [lastPage, setLastPage] = useState(-1);
   const [dropdownCurrent, setDropdownCurrent] = useState(0);
 
-  const previousSessionRecap = recapByLanguage[dropdownData[dropdownCurrent] as 'EN' | 'HR'].slice(Math.max(0, currentPage - 3), currentPage);
+  const previousSessionRecap = recapByLanguage[dropdownData[dropdownCurrent] as 'EN' | 'HR'].slice(Math.max(0, currentPage - 2), currentPage);
 
   useEffect(() => {
     pressed === false && setLastPage(currentPage);
@@ -181,7 +181,7 @@ function PageContainer({ prevCallback, currentPage, setCurrentPage, goToSplashSc
       <div style={{ color: bgColor }}>{recap}</div>
       {previousSessionRecap && lastPage && lastPage > 0 && currentPage === lastPage && (
         <>
-          <div className='recap-title' style={{ color: bgColor, marginTop: '1rem' }}>{dropdownCurrent === 0 ? 'Previous session recap' : 'Sažetak prethodne sjednice'}</div>
+          <div className='recap-title' style={{ color: bgColor, marginTop: '1rem' }}>{dropdownCurrent === 0 ? 'Previous session recap' : 'Sažetak prethodne sesije'}</div>
           <div style={{ color: bgColor }}>
             {previousSessionRecap.map((r, index) => (
               <div key={index} style={{ color: bgColor }}>{r}</div>
