@@ -189,6 +189,7 @@ function PageContainer({ prevCallback, currentPage, setCurrentPage, goToSplashSc
           </div>
         </>
       ) || null}
+      <div className='recap-whitespace'></div>
     </div>
   </div>
 }
